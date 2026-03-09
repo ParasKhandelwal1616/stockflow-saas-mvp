@@ -13,7 +13,9 @@ const prisma = new PrismaClient();
 // Export the prisma instance for use in routes
 export { prisma };
 
-app.use(cors());
+app.use(cors({
+  origin: 'https://stockflow-saas-mvp.vercel.app'
+}));
 app.use(express.json());
 
 // Health check route
