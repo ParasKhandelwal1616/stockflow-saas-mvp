@@ -38,10 +38,10 @@ export default function Dashboard() {
   const [formData, setFormData] = useState({
     sku: '',
     name: '',
-    quantity: 0,
-    lowStockThreshold: 5,
-    costPrice: 0,
-    sellingPrice: 0
+    quantity: '0',
+    lowStockThreshold: '5',
+    costPrice: '0',
+    sellingPrice: '0'
   });
 
   const fetchProducts = async () => {
@@ -62,19 +62,33 @@ export default function Dashboard() {
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await API.post('/products', formData);
+      // Map string values to numbers for the API
+      const payload = {
+        ...formData,
+        quantity: parseInt(formData.quantity) || 0,
+        lowStockThreshold: parseInt(formData.lowStockThreshold) || 0,
+        costPrice: parseFloat(formData.costPrice) || 0,
+        sellingPrice: parseFloat(formData.sellingPrice) || 0,
+      };
+      await API.post('/products', payload);
       setShowModal(false);
       setFormData({
         sku: '',
         name: '',
-        quantity: 0,
-        lowStockThreshold: 5,
-        costPrice: 0,
-        sellingPrice: 0
+        quantity: '0',
+        lowStockThreshold: '5',
+        costPrice: '0',
+        sellingPrice: '0'
       });
       fetchProducts();
-    } catch (err) {
-      alert('Failed to add product');
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        alert('Your session has expired. Please log in again.');
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      } else {
+        alert('Failed to add product: ' + (err.response?.data?.error || 'Unknown error'));
+      }
     }
   };
 
@@ -316,7 +330,7 @@ export default function Dashboard() {
                     required
                     type="number"
                     value={formData.quantity}
-                    onChange={(e) => setFormData({...formData, quantity: parseInt(e.target.value)})}
+                    onChange={(e) => setFormData({...formData, quantity: e.target.value})}
                     className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-700 transition-all"
                   />
                 </div>
@@ -326,7 +340,7 @@ export default function Dashboard() {
                     required
                     type="number"
                     value={formData.lowStockThreshold}
-                    onChange={(e) => setFormData({...formData, lowStockThreshold: parseInt(e.target.value)})}
+                    onChange={(e) => setFormData({...formData, lowStockThreshold: e.target.value})}
                     className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-700 transition-all"
                   />
                 </div>
@@ -337,7 +351,7 @@ export default function Dashboard() {
                     type="number"
                     step="0.01"
                     value={formData.costPrice}
-                    onChange={(e) => setFormData({...formData, costPrice: parseFloat(e.target.value)})}
+                    onChange={(e) => setFormData({...formData, costPrice: e.target.value})}
                     className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-700 transition-all"
                   />
                 </div>
@@ -348,7 +362,7 @@ export default function Dashboard() {
                     type="number"
                     step="0.01"
                     value={formData.sellingPrice}
-                    onChange={(e) => setFormData({...formData, sellingPrice: parseFloat(e.target.value)})}
+                    onChange={(e) => setFormData({...formData, sellingPrice: e.target.value})}
                     className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-700 transition-all"
                   />
                 </div>
