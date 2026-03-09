@@ -12,9 +12,11 @@ import {
   Loader2, 
   X,
   Filter,
-  ArrowUpRight,
-  ArrowDownRight
+  Download,
+  Layout
 } from 'lucide-react';
+import StockChart from '@/components/StockChart';
+import Alerts from '@/components/Alerts';
 
 interface Product {
   id: string;
@@ -76,6 +78,21 @@ export default function Dashboard() {
     }
   };
 
+  const handleExport = async () => {
+    try {
+      const response = await API.get('/products/export', { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `inventory-export-${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      alert('Failed to export inventory');
+    }
+  };
+
   const filteredProducts = products.filter(p => 
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     p.sku.toLowerCase().includes(searchQuery.toLowerCase())
@@ -93,56 +110,63 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-2xl flex flex-col justify-between group hover:border-zinc-700 transition-all">
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-500">
-              <Package size={20} />
-            </div>
-            <span className="text-xs font-medium text-blue-500 bg-blue-500/10 px-2 py-1 rounded-full flex items-center gap-1">
-              <TrendingUp size={12} />
-              +12.5%
-            </span>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-zinc-500">Total Products</p>
-            <h3 className="text-2xl font-bold text-zinc-100 mt-1">{totalProducts}</h3>
-          </div>
-        </div>
+    <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+      <Alerts products={products} />
 
-        <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-2xl flex flex-col justify-between group hover:border-zinc-700 transition-all">
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-500">
-              <AlertTriangle size={20} />
-            </div>
-            {lowStockCount > 0 && (
-              <span className="text-xs font-medium text-amber-500 bg-amber-500/10 px-2 py-1 rounded-full">
-                Attention Required
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <StockChart products={products} />
+        </div>
+        
+        <div className="space-y-6">
+          <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-2xl flex flex-col justify-between group hover:border-zinc-700 transition-all h-[165px]">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-500">
+                <Package size={20} />
+              </div>
+              <span className="text-xs font-medium text-blue-500 bg-blue-500/10 px-2 py-1 rounded-full flex items-center gap-1">
+                <TrendingUp size={12} />
+                +12.5%
               </span>
-            )}
-          </div>
-          <div>
-            <p className="text-sm font-medium text-zinc-500">Low Stock Alert</p>
-            <h3 className={`text-2xl font-bold mt-1 ${lowStockCount > 0 ? 'text-amber-500' : 'text-zinc-100'}`}>
-              {lowStockCount}
-            </h3>
-          </div>
-        </div>
-
-        <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-2xl flex flex-col justify-between group hover:border-zinc-700 transition-all sm:col-span-2 lg:col-span-1">
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500">
-              <DollarSign size={20} />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-zinc-500">Total Products</p>
+              <h3 className="text-2xl font-bold text-zinc-100 mt-1">{totalProducts}</h3>
             </div>
           </div>
-          <div>
-            <p className="text-sm font-medium text-zinc-500">Inventory Value</p>
-            <h3 className="text-2xl font-bold text-zinc-100 mt-1">
-              ${inventoryValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </h3>
+
+          <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-2xl flex flex-col justify-between group hover:border-zinc-700 transition-all h-[165px]">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-500">
+                <AlertTriangle size={20} />
+              </div>
+              {lowStockCount > 0 && (
+                <span className="text-xs font-medium text-amber-500 bg-amber-500/10 px-2 py-1 rounded-full">
+                  Attention Required
+                </span>
+              )}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-zinc-500">Low Stock Alert</p>
+              <h3 className={`text-2xl font-bold mt-1 ${lowStockCount > 0 ? 'text-amber-500' : 'text-zinc-100'}`}>
+                {lowStockCount}
+              </h3>
+            </div>
           </div>
+        </div>
+      </div>
+
+      <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-2xl flex flex-col justify-between group hover:border-zinc-700 transition-all">
+        <div className="flex items-center justify-between mb-4">
+          <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500">
+            <DollarSign size={20} />
+          </div>
+        </div>
+        <div>
+          <p className="text-sm font-medium text-zinc-500">Inventory Value</p>
+          <h3 className="text-2xl font-bold text-zinc-100 mt-1">
+            ${inventoryValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </h3>
         </div>
       </div>
 
@@ -160,10 +184,13 @@ export default function Dashboard() {
             />
           </div>
           
-          <div className="flex gap-3 w-full md:w-auto">
-            <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 rounded-xl text-sm font-medium transition-all">
-              <Filter size={18} />
-              Filters
+          <div className="flex flex-wrap gap-3 w-full md:w-auto">
+            <button 
+              onClick={handleExport}
+              className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 rounded-xl text-sm font-medium transition-all"
+            >
+              <Download size={18} />
+              Download Report
             </button>
             <button 
               onClick={() => setShowModal(true)}

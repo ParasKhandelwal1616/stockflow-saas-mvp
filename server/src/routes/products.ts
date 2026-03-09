@@ -1,8 +1,37 @@
 import express, { Response } from 'express';
 import { prisma } from '../index';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
+import { Parser } from 'json2csv';
 
 const router = express.Router();
+
+// Export products to CSV
+router.get('/export', authMiddleware, async (req: AuthRequest, res: Response) => {
+  const orgId = req.user?.orgId;
+
+  if (!orgId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  try {
+    const products = await prisma.product.findMany({
+      where: { orgId }
+    });
+
+    const fields = ['sku', 'name', 'quantity', 'lowStockThreshold', 'costPrice', 'sellingPrice'];
+    const opts = { fields };
+    const parser = new Parser(opts);
+    const csv = parser.parse(products);
+
+    res.header('Content-Type', 'text/csv');
+    res.attachment(`inventory-export-${new Date().toISOString().split('T')[0]}.csv`);
+    res.send(csv);
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to export inventory" });
+  }
+});
 
 // Create a product
 router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
