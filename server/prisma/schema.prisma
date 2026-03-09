@@ -1,14 +1,39 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
-datasource db {
-  provider = "postgresql"
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Organization {
+  id                String    @id @default(cuid())
+  name              String
+  defaultThreshold  Int       @default(5)
+  users             User[]
+  products          Product[]
+  createdAt         DateTime  @default(now())
+}
+
+model User {
+  id             String       @id @default(cuid())
+  email          String       @unique
+  password       String
+  orgId          String
+  organization   Organization @relation(fields: [orgId], references: [id])
+}
+
+model Product {
+  id                String       @id @default(cuid())
+  sku               String
+  name              String
+  quantity          Int          @default(0)
+  lowStockThreshold Int?         
+  costPrice         Float?
+  sellingPrice      Float?
+  orgId             String
+  organization      Organization @relation(fields: [orgId], references: [id])
+  
+  @@unique([orgId, sku]) // SKU must be unique ONLY within the same company
 }
