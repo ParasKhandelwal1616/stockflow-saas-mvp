@@ -146,8 +146,6 @@ export default function SettingsPage() {
                 </div>
               </div>
             </section>
-          </div>
-        );
 
             <section className="bg-zinc-900/50 border border-zinc-800 p-8 rounded-3xl space-y-6">
               <h3 className="text-sm font-bold text-zinc-100 uppercase tracking-widest flex items-center gap-2">
