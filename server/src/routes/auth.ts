@@ -115,7 +115,11 @@ router.post('/register', async (req, res) => {
     });
   } catch (error: any) {
     console.error(error);
-    res.status(400).json({ error: "Registration failed", details: error.message });
+    res.status(400).json({ 
+      error: "Registration failed", 
+      message: error.message,
+      code: error.code // Prisma error codes help a lot
+    });
   }
 });
 
