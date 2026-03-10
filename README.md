@@ -1,15 +1,15 @@
-# StockFlow SaaS MVP 🚀
+# StockFlow SaaS MVP
 
 A high-performance, multi-tenant Stock Management System built for modern retail and warehouse operations.
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 - **Frontend:** Next.js 15 (App Router), Tailwind CSS (Zinc Dark Theme), Recharts, Lucide Icons.
 - **Backend:** Node.js, Express.js, JWT Authentication.
 - **Database:** Prisma ORM with SQLite (Single-Database, Shared-Schema model).
 - **Communication:** Axios with interceptors for seamless auth handling.
 
-## 🏗️ Architectural Choices
+##  Architectural Choices
 
 ### Multi-tenancy Model: Shared-Schema
 We implemented a **"Single-Database, Shared-Schema"** multi-tenancy model. 
@@ -22,7 +22,7 @@ We implemented a **"Single-Database, Shared-Schema"** multi-tenancy model.
 - **Row-Level Filtering:** Middleware injects `orgId` into requests, ensuring users can *never* access data outside their own organization.
 - **Password Hashing:** Industry-standard `bcryptjs` encryption.
 
-## ✨ Key Features
+##  Key Features
 
 - **Inventory Intelligence:** Visual data distribution with Recharts.
 - **Real-time Alerts:** Pulse-animated "Low Stock" notification center.
@@ -30,7 +30,7 @@ We implemented a **"Single-Database, Shared-Schema"** multi-tenancy model.
 - **Modern UI:** Clean, responsive "Zinc" dark-themed interface.
 - **Tenant Verification:** Read-only Organization ID visibility for developer-grade isolation proof.
 
-## 🚀 Setup Instructions
+##  Setup Instructions
 
 ### 1. Prerequisites
 - Node.js (v18+)
@@ -54,7 +54,7 @@ npm install
 npm run dev
 ```
 
-## 🧪 Database Seeding
+## Database Seeding
 To see the application in action immediately, run `npx prisma db seed` in the `server` directory. This creates a test organization, user, and a sample inventory.
 
 ---
