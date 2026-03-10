@@ -20,8 +20,10 @@ export default function Register() {
     setError('');
 
     try {
-      await API.post('/auth/register', { name, email, password });
-      router.push('/login');
+      const { data } = await API.post('/auth/register', { name, email, password });
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Registration failed');
     } finally {

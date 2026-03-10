@@ -108,10 +108,16 @@ router.post('/register', async (req, res) => {
       return { organization, user };
     });
 
+    const token = jwt.sign({ userId: result.user.id, orgId: result.organization.id }, JWT_SECRET, { expiresIn: '1d' });
+
     res.status(201).json({
       message: "Organization and User created successfully",
-      orgId: result.organization.id,
-      userId: result.user.id
+      token,
+      user: {
+        id: result.user.id,
+        email: result.user.email,
+        orgId: result.organization.id
+      }
     });
   } catch (error: any) {
     console.error(error);

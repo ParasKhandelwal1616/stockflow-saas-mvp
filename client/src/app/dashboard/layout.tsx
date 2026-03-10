@@ -11,12 +11,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<{ email: string } | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
     if (!token) {
       router.push('/login');
     } else {
+      if (userData) {
+        try {
+          setUser(JSON.parse(userData));
+        } catch (e) {
+          console.error("Failed to parse user data", e);
+        }
+      }
       setLoading(false);
     }
   }, [router]);
@@ -137,11 +146,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="h-8 w-[1px] bg-zinc-200 dark:bg-zinc-800 hidden sm:block"></div>
             <div className="flex items-center gap-3">
               <div className="hidden sm:flex flex-col items-end">
-                <span className="text-xs font-medium text-zinc-950 dark:text-zinc-300">Admin User</span>
+                <span className="text-xs font-medium text-zinc-950 dark:text-zinc-300">
+                  {user?.email || 'User'}
+                </span>
                 <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Admin</span>
               </div>
               <div className="w-10 h-10 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full flex items-center justify-center text-zinc-950 dark:text-zinc-100 font-bold shadow-sm">
-                A
+                {user?.email?.[0]?.toUpperCase() || 'U'}
               </div>
             </div>
           </div>
