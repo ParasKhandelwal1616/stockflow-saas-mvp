@@ -14,7 +14,7 @@ const prisma = new PrismaClient();
 export { prisma };
 
 app.use(cors({
-  origin: [/https:\/\/stockflow-saas-mvp.*\.vercel\.app$/, 'https://stockflow-saas-mvp.vercel.app']
+  origin: '*'
 }));
 app.use(express.json());
 
